@@ -13,41 +13,96 @@ url = 'https://lk.sut.ru/cabinet/'
 pathToExe = "C:/Users/danii/Downloads/chromedriver_win32/chromedriver.exe"
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
-def openSite(driver):
-    driver.get(url)
-    driver.find_element_by_name("users").send_keys(datas["users"])
-    driver.find_element_by_name("parole").send_keys(datas["parole"])
-    driver.find_element_by_name("logButton").click()
-    time.sleep(3)
-    driver.find_element_by_class_name("lm_item").click()
-    driver.find_element_by_class_name("l_menu_a").click()
+
+
 def getSchedule():
-    driver = webdriver.Chrome(executable_path=pathToExe,options=chrome_options)
     elementsArr = []
-    openSite(driver)
-    time.sleep(1)
-    elements = driver.find_elements_by_partial_link_text("Кнопка")
-    for elements in elements:
-        elementsArr.append(elements.text.split(" ")[3].replace(".", ""))
-    print(elementsArr)
-    driver.quit()
-    clickButton(elementsArr, driver)
-def clickButton(elementsArr, driver):
+    driver = webdriver.Chrome(executable_path=pathToExe,options=chrome_options)
+    driver.get(url)
+    try:
+        login = WebDriverWait(driver, 1).until(
+        EC.visibility_of_element_located((By.NAME, "users")))
+    finally:
+        login.send_keys(datas["users"])
+        driver.find_element_by_name("parole").send_keys(datas["parole"])
+        driver.find_element_by_name("logButton").click()
+        try:
+            button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
+        finally:
+            button.click()
+            try:
+                sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
+            finally:
+                sch.click()
+                try: 
+                    elements = WebDriverWait(driver, 1).until(EC.visibility_of_elements_located((By.PARTIAL_LINK_TEXT, "Кнопка")))
+                finally:
+                    for elements in elements:
+                        elementsArr.append(elements.text.split(" ")[3].replace(".", ""))
+                    elementsArr = set(elementsArr)
+                    driver.quit()
+                    clickButton(elementsArr)
+
+
+def clickButton(elementsArr):
     i = 0
     for i in range(0, len(elementsArr)):
         # TODO: разобраться с shedule
-        schedule.every().day.at(elementsArr[i]).do(click(driver))
-def click(driver):
-    openSite(driver)
+        schedule.every().day.at(elementsArr[i]).do(click)
+
+
+def click():
+    driver = webdriver.Chrome(executable_path=pathToExe,options=chrome_options)
+    driver.get(url)
     try:
-        button = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.PARTIAL_LINK_TEXT, "Начать"))
-    )
+        login = WebDriverWait(driver, 1).until(
+        EC.visibility_of_element_located((By.NAME, "users")))
     finally:
-        button.click()
-        driver.quit()
-schedule.every().day.at("03:08").do(getSchedule)
+        login.send_keys(datas["users"])
+        driver.find_element_by_name("parole").send_keys(datas["parole"])
+        driver.find_element_by_name("logButton").click()
+        try:
+            button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
+        finally:
+            button.click()
+            try:
+                sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
+            finally:
+                sch.click()
+                try:
+                    button = WebDriverWait(driver, 1).until(
+                    EC.visibility_of_element_located((By.PARTIAL_LINK_TEXT, "Начать"))
+                )
+                finally:
+                    button.click()
+                    driver.quit()
+
+def testSch():
+    driver = webdriver.Chrome(executable_path=pathToExe,options=chrome_options)
+    driver.get(url)
+    try:
+        login = WebDriverWait(driver, 1).until(
+        EC.visibility_of_element_located((By.NAME, "users")))
+    finally:
+        login.send_keys(datas["users"])
+        driver.find_element_by_name("parole").send_keys(datas["parole"])
+        driver.find_element_by_name("logButton").click()
+        try:
+            button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
+        finally:
+            button.click()
+            try:
+                sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
+            finally:
+                sch.click()
+
+def arr():
+    elementsArr = ["20:15:58", "20:15", "20:16"]
+    i = 0
+    for i in range(0, len(elementsArr)):
+        # TODO: разобраться с shedule
+        schedule.every().day.at(elementsArr[i]).do(testSch)
+schedule.every().day.at("8:00").do(getSchedule)
 while True:
     schedule.run_pending()
-    time.sleep(10)
-
+    time.sleep(1)
