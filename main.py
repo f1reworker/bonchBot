@@ -1,6 +1,4 @@
-
 from selenium import webdriver
-import schedule
 import time
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -41,18 +39,10 @@ def getSchedule():
                 finally:
                     for elements in elements:
                         elementsArr.append(elements.text.split(" ")[3].replace(".", ""))
-                    elementsArr = set(elementsArr)
-                    elementsArr = list(elementsArr)
+                    elementsArr = list(set(elementsArr)).sort()
                     driver.quit()
                     clickButton(elementsArr)
                     print(elementsArr)
-
-
-def clickButton(elementsArr):
-    i = 0
-    for i in range(0, len(elementsArr)):
-        # TODO: разобраться с shedule
-        schedule.every().day.at(elementsArr[i]).do(click)
 
 
 def click():
@@ -81,6 +71,24 @@ def click():
                         time.sleep(300)
                         i+=5
                         driver.find_element_by_partial_link_text("Обновить").click()
+                driver.quit()
+
+
+def clickButton(elementsArr):
+    i = 0
+    lessonTime = []
+    for i in range(0, len(elementsArr)):
+        lesson = elementsArr[i].split(":")
+        lessonTime.append(int(lesson[0])*3600+int(lesson[1])*60-10800)
+        if i==0:
+            time.sleep(lessonTime[i]-28800)
+            click()
+        if i!=0:
+            time.sleep(lessonTime[i]-lessonTime[i-1]-30600)
+            click()
+
+
+
 
 def testSch():
     driver = webdriver.Chrome(executable_path=pathToExe,options=chrome_options)
@@ -101,16 +109,11 @@ def testSch():
             finally:
                 sch.click()
                 i = 0
-                while i<=20:
+                while i<=30:
                     try:
                         driver.find_element_by_partial_link_text("Начать").click()
                     except NoSuchElementException:
                         time.sleep(300)
                         i+=5
                         driver.find_element_by_partial_link_text("Обновить").click()
-
-
-schedule.every().day.at("07:00").do(getSchedule)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    time.sleep((30-i)*60)
