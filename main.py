@@ -1,3 +1,4 @@
+import os
 from selenium import webdriver
 import time
 from selenium.common.exceptions import NoSuchElementException
@@ -6,29 +7,33 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import schedule
 
-import config
+#import config
 
 
 
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = os.environ.get('GOOGLE_CHROME_SHIM', None)
 pathToExe = "C:/Users/danii/Downloads/chromedriver_win32/chromedriver.exe"
 chrome_options.add_argument("--incognito")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
-
+datas = {
+    "users": "daniil.shalin2406@mail.ru",
+    "parole": "fireworker"
+}
 
 
 def getSchedule():
     elementsArr = []
-    driver = webdriver.Chrome(executable_path= pathToExe, options=chrome_options)
+    driver = webdriver.Chrome(executable_path="chromedriver", options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
         EC.visibility_of_element_located((By.NAME, "users")))
     finally:
-        login.send_keys(config.datas["users"])
-        driver.find_element_by_name("parole").send_keys(config.datas["parole"])
+        login.send_keys(datas["users"])
+        driver.find_element_by_name("parole").send_keys(datas["parole"])
         driver.find_element_by_name("logButton").click()
         try:
             button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
@@ -51,14 +56,14 @@ def getSchedule():
 
 
 def click():
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(executable_path="chromedriver", options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
         EC.visibility_of_element_located((By.NAME, "users")))
     finally:
-        login.send_keys(config.datas["users"])
-        driver.find_element_by_name("parole").send_keys(config.datas["parole"])
+        login.send_keys(datas["users"])
+        driver.find_element_by_name("parole").send_keys(datas["parole"])
         driver.find_element_by_name("logButton").click()
         try:
             button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
@@ -88,14 +93,14 @@ def clickButton(elementsArr):
 
 
 def testSch():
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(executable_path="chromedriver", options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
         EC.visibility_of_element_located((By.NAME, "users")))
     finally:
-        login.send_keys(config.datas["users"])
-        driver.find_element_by_name("parole").send_keys(config.datas["parole"])
+        login.send_keys(datas["users"])
+        driver.find_element_by_name("parole").send_keys(    datas["parole"])
         driver.find_element_by_name("logButton").click()
         try:
             button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
