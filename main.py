@@ -52,7 +52,7 @@ def getSchedule():
                         elementsArr = list(set(elementsArr)).sort()
                         driver.quit()
                         clickButton(elementsArr)
-                        
+                        print(elementsArr)
 
 
 def click():
