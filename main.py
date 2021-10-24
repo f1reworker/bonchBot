@@ -88,6 +88,7 @@ def clickButton(elementsArr):
     for i in range(0, len(elementsArr)):
         schedule.every().day.at(elementsArr[i]).do(click)
         
+        
 
 
 
