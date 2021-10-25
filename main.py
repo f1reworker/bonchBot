@@ -2,6 +2,7 @@ import os
 from selenium import webdriver
 import time
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -9,12 +10,11 @@ import schedule
 
 #import config
 
-
-GOOGLE_CHROME_PATH = '/app/.apt/usr/bin/google_chrome'
-CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
+GOOGLE_CHROME_BIN = "/app/.apt/usr/bin/google-chrome"
+CHROMEDRIVER_PATH = "/app/.chromedriver/bin/chromedriver"
 url = 'https://lk.sut.ru/cabinet/'
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+chrome_options = Options()
+chrome_options.binary_location = GOOGLE_CHROME_BIN
 pathToExe = "C:/Users/danii/Downloads/chromedriver_win32/chromedriver.exe"
 chrome_options.add_argument("--incognito")
 chrome_options.add_argument("--headless")
@@ -31,7 +31,7 @@ datas = {
 
 def getSchedule():
     elementsArr = []
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -61,7 +61,7 @@ def getSchedule():
 
 
 def click():
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -98,7 +98,7 @@ def clickButton(elementsArr):
 
 
 def testSch():
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
