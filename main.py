@@ -6,10 +6,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import schedule
 
 #import config
-
+s=Service(ChromeDriverManager().install())
 GOOGLE_CHROME_BIN = "/app/.apt/usr/bin/google-chrome"
 CHROMEDRIVER_PATH = "/app/.chromedriver/bin/chromedriver"
 url = 'https://lk.sut.ru/cabinet/'
@@ -31,7 +33,7 @@ datas = {
 
 def getSchedule():
     elementsArr = []
-    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+    driver = webdriver.Chrome(service = s)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -61,7 +63,7 @@ def getSchedule():
 
 
 def click():
-    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -98,7 +100,7 @@ def clickButton(elementsArr):
 
 
 def testSch():
-    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
