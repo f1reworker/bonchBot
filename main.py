@@ -14,7 +14,7 @@ GOOGLE_CHROME_PATH = '/app/.apt/usr/bin/google_chrome'
 CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = GOOGLE_CHROME_PATH
+chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 pathToExe = "C:/Users/danii/Downloads/chromedriver_win32/chromedriver.exe"
 chrome_options.add_argument("--incognito")
 chrome_options.add_argument("--headless")
