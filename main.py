@@ -47,18 +47,15 @@ def getSchedule():
                 sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
             finally:
                 sch.click()
-                try:
-                    elements = driver.find_elements(By.PARTIAL_LINK_TEXT, "Кнопка")
-                except NoSuchElementException:
-                    elements = []
-                finally:
-                    if elements!=[]:
-                        for elements in elements:
-                            elementsArr.append(elements.text.split(" ")[3].replace(".", ""))
-                        elementsArr = list(set(elementsArr)).sort()
-                        driver.quit()
-                        clickButton(elementsArr)
-                print(elementsArr)
+                time.sleep(2)
+                elements = driver.find_elements(By.PARTIAL_LINK_TEXT, "Кнопка")
+                if elements!=[]:
+                    for elements in elements:
+                        elementsArr.append(elements.text.split(" ")[3].replace(".", ""))
+                    elementsArr = list(set(elementsArr))
+                    driver.quit()
+                    clickButton(elementsArr)
+            print(elementsArr)
 
 
 def click():
@@ -96,8 +93,8 @@ def clickButton(elementsArr):
         timeLesson = str(int(lesson[0])-3)+":"+lesson[1]
         if len(timeLesson)==4:  timeLesson = "0"+timeLesson
         schedule.every().day.at(timeLesson).do(click)
-        
-schedule.every().day.at("22:35").do(getSchedule)
+            
+schedule.every().day.at("22:52").do(getSchedule)
 while True:
     schedule.run_pending()
     time.sleep(1)
