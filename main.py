@@ -96,7 +96,7 @@ def clickButton(elementsArr):
         
 
 getSchedule()
-schedule.every().day.at("08:30").do(getSchedule)
+schedule.every().day.at("04:30").do(getSchedule)
 while True:
     schedule.run_pending()
     time.sleep(1)
