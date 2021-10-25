@@ -123,7 +123,7 @@ def testSch():
                         driver.find_element_by_partial_link_text("Обновить").click()
     time.sleep((30-i)*60)
 getSchedule()
-schedule.every().day.at("08:00").do(getSchedule)
+schedule.every().day.at("08:30").do(getSchedule)
 while True:
     schedule.run_pending()
     time.sleep(1)
