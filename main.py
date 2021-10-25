@@ -19,6 +19,8 @@ pathToExe = "C:/Users/danii/Downloads/chromedriver_win32/chromedriver.exe"
 chrome_options.add_argument("--incognito")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--no-sandbox")
 datas = {
     "users": "daniil.shalin2406@mail.ru",
     "parole": "fireworker"
@@ -29,7 +31,7 @@ datas = {
 
 def getSchedule():
     elementsArr = []
-    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMRDRIVER_PATH"), options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -59,7 +61,7 @@ def getSchedule():
 
 
 def click():
-    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMRDRIVER_PATH"), options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -96,7 +98,7 @@ def clickButton(elementsArr):
 
 
 def testSch():
-    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMRDRIVER_PATH"), options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
