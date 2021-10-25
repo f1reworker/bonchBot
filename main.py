@@ -92,10 +92,13 @@ def click():
 
 def clickButton(elementsArr):
     for i in range(0, len(elementsArr)):
-        schedule.every().day.at(elementsArr[i]).do(click)
+        lesson = elementsArr[i].split(":")
+        timeLesson = str(int(lesson[0])-3)+":"+lesson[1]
+        if len(timeLesson)==4:  timeLesson = "0"+timeLesson
+        schedule.every().day.at(timeLesson).do(click)
         
-
-schedule.every().day.at("01:15").do(getSchedule)
+clickButton(["09:00", "10:45", "13:00"])
+schedule.every().day.at("22:29").do(getSchedule)
 while True:
     schedule.run_pending()
     time.sleep(1)
