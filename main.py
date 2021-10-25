@@ -10,10 +10,11 @@ import schedule
 #import config
 
 
-
+GOOGLE_CHROME_PATH = '/app/.apt/usr/bin/google_chrome'
+CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get('GOOGLE_CHROME_SHIM', None)
+chrome_options.binary_location = GOOGLE_CHROME_PATH
 pathToExe = "C:/Users/danii/Downloads/chromedriver_win32/chromedriver.exe"
 chrome_options.add_argument("--incognito")
 chrome_options.add_argument("--headless")
@@ -24,9 +25,11 @@ datas = {
 }
 
 
+
+
 def getSchedule():
     elementsArr = []
-    driver = webdriver.Chrome(executable_path="chromedriver", options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -56,7 +59,7 @@ def getSchedule():
 
 
 def click():
-    driver = webdriver.Chrome(executable_path="chromedriver", options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -93,7 +96,7 @@ def clickButton(elementsArr):
 
 
 def testSch():
-    driver = webdriver.Chrome(executable_path="chromedriver", options=chrome_options)
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
