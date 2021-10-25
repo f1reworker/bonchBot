@@ -31,7 +31,7 @@ datas = {
 
 def getSchedule():
     elementsArr = []
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMRDRIVER_PATH"), options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -61,7 +61,7 @@ def getSchedule():
 
 
 def click():
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMRDRIVER_PATH"), options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
@@ -98,7 +98,7 @@ def clickButton(elementsArr):
 
 
 def testSch():
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMRDRIVER_PATH"), options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
     driver.get(url)
     try:
         login = WebDriverWait(driver, 1).until(
