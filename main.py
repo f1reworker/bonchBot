@@ -1,7 +1,6 @@
 from selenium import webdriver
 import time
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.chrome import service
+from selenium.common.exceptions import NoSuchElementException, UnexpectedAlertPresentException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,16 +9,14 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import schedule
 import config
-import bot
-
 s=Service(ChromeDriverManager().install())
 
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-#chrome_options.add_argument("--headless")
-#chrome_options.add_argument("--disable-gpu")
-#chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -97,9 +94,25 @@ def arrSchedule():
     for i in range(0, len(config.users)):
         getSchedule(config.users[i])
 
-if __name__ == "__main__":
-    # Запуск бота
-    bot.executor.start_polling(bot.bot, skip_updates=True)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+def checkAuth(loginUser, passwordUser):
+    driver = webdriver.Chrome(service = s, options = chrome_options)
+    driver.get(url)
+    try:
+        login = WebDriverWait(driver, 1).until(
+        EC.visibility_of_element_located((By.NAME, "users")))
+    finally:
+        login.send_keys(loginUser)
+        driver.find_element(By.NAME,"parole").send_keys(passwordUser)
+        driver.find_element(By.NAME, "logButton").click()
+        time.sleep(0.5)
+        try: 
+            driver.find_element(By.CLASS_NAME, "lm_item")
+        except UnexpectedAlertPresentException:  return False
+        else:   return True
+
+# if __name__ == "__main__":
+#     # Запуск бота
+#     executor.start_polling(bot.bot, skip_updates=True)
+#while True:
+#    schedule.run_pending()
+#    time.sleep(1)
