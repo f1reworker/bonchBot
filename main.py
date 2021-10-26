@@ -1,4 +1,3 @@
-import os
 from selenium import webdriver
 import time
 from selenium.common.exceptions import NoSuchElementException
@@ -10,25 +9,24 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import schedule
+import config
+import bot
 
 s=Service(ChromeDriverManager().install())
 
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--disable-dev-shm-usage")
+#chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
-datas = {
-    "users": "daniil.shalin2406@mail.ru",
-    "parole": "fireworker"
-}
 
 
 
 
-def getSchedule():
+
+def getSchedule(user):
     elementsArr = []
     driver = webdriver.Chrome(service = s, options = chrome_options)
     driver.get(url)
@@ -36,8 +34,8 @@ def getSchedule():
         login = WebDriverWait(driver, 1).until(
         EC.visibility_of_element_located((By.NAME, "users")))
     finally:
-        login.send_keys(datas["users"])
-        driver.find_element(By.NAME,"parole").send_keys(datas["parole"])
+        login.send_keys(user["login"])
+        driver.find_element(By.NAME,"parole").send_keys(user["password"])
         driver.find_element(By.NAME, "logButton").click()
         try:
             button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
@@ -53,8 +51,8 @@ def getSchedule():
                     for elements in elements:
                         elementsArr.append(elements.text.split(" ")[3].replace(".", ""))
                     elementsArr = list(set(elementsArr))
-                    driver.quit()
-                    clickButton(elementsArr)
+                    #clickButton(elementsArr)
+            driver.quit()
             print(elementsArr)
 
 
@@ -65,8 +63,8 @@ def click():
         login = WebDriverWait(driver, 1).until(
         EC.visibility_of_element_located((By.NAME, "users")))
     finally:
-        login.send_keys(datas["users"])
-        driver.find_element(By.NAME, "parole").send_keys(datas["parole"])
+        #login.send_keys(datas["users"])
+        #driver.find_element(By.NAME, "parole").send_keys(datas["parole"])
         driver.find_element(By.NAME, "logButton").click()
         try:
             button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
@@ -95,7 +93,13 @@ def clickButton(elementsArr):
         print(timeLesson)
         schedule.every().day.at(timeLesson).do(click)
 
-schedule.every().day.at("23:04").do(getSchedule)
+def arrSchedule():
+    for i in range(0, len(config.users)):
+        getSchedule(config.users[i])
+
+if __name__ == "__main__":
+    # Запуск бота
+    bot.executor.start_polling(bot.bot, skip_updates=True)
 while True:
     schedule.run_pending()
     time.sleep(1)
