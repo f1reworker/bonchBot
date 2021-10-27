@@ -78,7 +78,7 @@ def click():
                     except NoSuchElementException:
                         time.sleep(300)
                         i+=5
-                        driver.find_element(By.PARTIAL_LINK_TEXT, "Обновить").click()
+                        driver.find_element(By.PARTIAL_LINK_TEXT, "начала от").click()
                 driver.quit()
 
 
@@ -107,12 +107,13 @@ def checkAuth(loginUser, passwordUser):
         time.sleep(0.5)
         try: 
             driver.find_element(By.CLASS_NAME, "lm_item")
-        except UnexpectedAlertPresentException:  return False
-        else:   return True
+        except UnexpectedAlertPresentException:
+            driver.quit()
+            return False
+        else:
+            driver.quit()
+            return True
 
-# if __name__ == "__main__":
-#     # Запуск бота
-#     executor.start_polling(bot.bot, skip_updates=True)
 #while True:
 #    schedule.run_pending()
 #    time.sleep(1)

@@ -1,13 +1,13 @@
 from aiogram import Bot, Dispatcher, types, executor
 import config
 import main
+import database
 token = Bot(token="2087293427:AAEqHp5QE7BK_7G8JNlDUdbhtKi9EqpMQdI")
 bot = Dispatcher(token)
 @bot.message_handler(commands="start")
 async def start(message: types.Message):
     config.login = ""
     config.password = ""
-    user_id = message.from_user.id
     await message.answer("Введите логин от лк", reply_markup=types.ReplyKeyboardRemove())
 
 @bot.message_handler(lambda message: message.text != "Да" and  message.text != "Нет")
@@ -26,6 +26,7 @@ async def auth(message: types.Message):
 @bot.message_handler(lambda message: message.text == "Да")
 async def true(message: types.Message):
     if main.checkAuth(config.login, config.password):
+        database.addUser(user_id=message.from_user.id, login = config.login, password = config.password)
         await message.answer("Вы зарегистрированы!", reply_markup=types.ReplyKeyboardRemove())
     else: 
         config.login = "" 
@@ -42,6 +43,5 @@ async def false(message: types.Message):
     await message.answer("Введите логин от лк", reply_markup=types.ReplyKeyboardRemove())
 
 if __name__ == "__main__":
-    # Запуск бота
     executor.start_polling(bot, skip_updates=True)
 
