@@ -8,7 +8,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import schedule
-import config
+from threading import Thread
+from aiogram import executor
+from tgBot import bot
+from database import db
+
+
 s=Service(ChromeDriverManager().install())
 
 url = 'https://lk.sut.ru/cabinet/'
@@ -46,11 +51,12 @@ def getSchedule(user):
                 elements = driver.find_elements(By.PARTIAL_LINK_TEXT, "Кнопка")
                 if elements!=[]:
                     for elements in elements:
-                        elementsArr.append(elements.text.split(" ")[3].replace(".", ""))
-                    elementsArr = list(set(elementsArr))
-                    #clickButton(elementsArr)
+                        lesson = elements.text.split(" ")[3].replace(".", "").split(":")
+                        timeLesson = str(int(lesson[0])-3)+":"+lesson[1]
+                        if len(timeLesson)==4:  timeLesson = "0"+timeLesson
+                        elementsArr.append(timeLesson)
+                    return elementsArr
             driver.quit()
-            print(elementsArr)
 
 
 def click():
@@ -82,18 +88,6 @@ def click():
                 driver.quit()
 
 
-def clickButton(elementsArr):
-    for i in range(0, len(elementsArr)):
-        lesson = elementsArr[i].split(":")
-        timeLesson = str(int(lesson[0])-3)+":"+lesson[1]
-        if len(timeLesson)==4:  timeLesson = "0"+timeLesson
-        print(timeLesson)
-        schedule.every().day.at(timeLesson).do(click)
-
-def arrSchedule():
-    for i in range(0, len(config.users)):
-        getSchedule(config.users[i])
-
 def checkAuth(loginUser, passwordUser):
     driver = webdriver.Chrome(service = s, options = chrome_options)
     driver.get(url)
@@ -114,6 +108,32 @@ def checkAuth(loginUser, passwordUser):
             driver.quit()
             return True
 
-#while True:
-#    schedule.run_pending()
-#    time.sleep(1)
+def pushSchedule():
+    usersArr = db.child("Users").get().each()
+    for i in range(0, len(usersArr)):
+        user_id = usersArr[i].key()
+        user = db.child("Users").child(user_id).get().val()
+        timeSched = getSchedule(user)
+        if timeSched!=None:
+            for q in range (0, len(timeSched)):
+                db.child("Schedule").child(timeSched[q]).child(user_id).set(False)
+
+def removeSchedule():
+    db.child("Schedule").remove()
+
+#! TODO: поменять время
+schedule.every().day.at("15:08").do(removeSchedule)
+schedule.every().day.at("15:09").do(pushSchedule)
+
+def runSchedule():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+def startBot():
+    executor.start_polling(bot, skip_updates=True)
+
+botThread = Thread(target=startBot)
+scheduleThread = Thread(target=runSchedule)
+scheduleThread.start()
+botThread.run()

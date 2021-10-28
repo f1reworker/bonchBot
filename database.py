@@ -1,5 +1,4 @@
 import pyrebase
-
 firebaseConfig = {
     "apiKey": "AIzaSyA6eRXO1BLuAZ3OTLvSwKbtj85Ow9E-gMo",
     "authDomain": "bonchbot.firebaseapp.com",
@@ -19,3 +18,4 @@ def addUser(user_id, login, password):
         "subscription": "2 mounth"
     }
     db.child("Users").child(user_id).set(data)
+
