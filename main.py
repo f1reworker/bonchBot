@@ -20,9 +20,9 @@ s=Service(ChromeDriverManager().install())
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-#chrome_options.add_argument("--headless")
-#chrome_options.add_argument("--disable-gpu")
-#chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -137,33 +137,11 @@ def removeSchedule():
 def getSchedule():
     timeArr = list(db.child("Schedule").get().val().keys())
     for i in range(0, len(timeArr)):
-        threadNumber = i%6
-        if threadNumber == 0:
-            thread0 = Thread(target = runNewSchedule, args=(timeArr[i],))
-            thread0.start()
-        elif threadNumber == 1:
-            thread1 = Thread(target = runNewSchedule, args=(timeArr[i],))
-            thread1.start()
-        elif threadNumber == 2:
-            thread2 = Thread(target = runNewSchedule, args=(timeArr[i],))
-            thread2.start()
-        elif threadNumber == 3:
-            thread3 = Thread(target = runNewSchedule, args=(timeArr[i],))
-            thread3.start()
-        elif threadNumber == 4:
-            thread4 = Thread(target = runNewSchedule, args=(timeArr[i],))
-            thread4.start()
-        elif threadNumber == 5:
-            thread5 = Thread(target = runNewSchedule, args=(timeArr[i],))
-            thread5.start()
-        elif i!=0 and threadNumber==0:
-            time.sleep(1500)
-        print(schedule.get_jobs())
+        runNewSchedule(timeArr[i])
 
-
+pushSchedule()
 schedule.every().day.at("22:00").do(removeSchedule)
 schedule.every().day.at("22:10").do(pushSchedule)
-getSchedule()
 def runSchedule():
     while True:
         schedule.run_pending()
