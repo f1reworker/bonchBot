@@ -1,4 +1,4 @@
-
+#TODO: каждая время новый поток
 from selenium import webdriver
 import time
 from selenium.common.exceptions import NoSuchElementException, UnexpectedAlertPresentException
@@ -117,11 +117,15 @@ def click(user, timeInt):
                             driver.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
                         except NoSuchElementException:
                             driver.quit()
+                            return
                         else:
                             db.child("Users").child(timeInt).child(user[i]).remove()
                             driver.quit()
     return schedule.CancelJob
 
+
+def runNewSchedule(timeInt):
+    schedule.every().day.at(timeInt).do(click, timeInt)
 
 def removeSchedule():
     db.child("Schedule").remove()
@@ -131,28 +135,31 @@ def getSchedule():
     for i in range(0, len(timeArr)):
         threadNumber = i%6
         if threadNumber == 0:
-            thread0 = Thread(target = schedule.every().day.at(timeArr[i]).do(click, timeArr[i]))
+            thread0 = Thread(target = runNewSchedule, args=(timeArr[i],))
             thread0.start()
         elif threadNumber == 1:
-            thread1 = Thread(target = schedule.every().day.at(timeArr[i]).do(click, timeArr[i]))
+            thread1 = Thread(target = runNewSchedule, args=(timeArr[i],))
             thread1.start()
         elif threadNumber == 2:
-            thread2 = Thread(target = schedule.every().day.at(timeArr[i]).do(click, timeArr[i]))
+            thread2 = Thread(target = runNewSchedule, args=(timeArr[i],))
             thread2.start()
         elif threadNumber == 3:
-            thread3 = Thread(target = schedule.every().day.at(timeArr[i]).do(click, timeArr[i]))
+            thread3 = Thread(target = runNewSchedule, args=(timeArr[i],))
             thread3.start()
         elif threadNumber == 4:
-            thread4 = Thread(target = schedule.every().day.at(timeArr[i]).do(click, timeArr[i]))
+            thread4 = Thread(target = runNewSchedule, args=(timeArr[i],))
             thread4.start()
         elif threadNumber == 5:
-            thread5 = Thread(target = schedule.every().day.at(timeArr[i]).do(click, timeArr[i]))
+            thread5 = Thread(target = runNewSchedule, args=(timeArr[i],))
             thread5.start()
+        elif i!=0 and threadNumber==0:
+            time.sleep(1500)
+        print(schedule.get_jobs())
 
 
 schedule.every().day.at("22:00").do(removeSchedule)
 schedule.every().day.at("22:10").do(pushSchedule)
-
+getSchedule()
 def runSchedule():
     while True:
         schedule.run_pending()
@@ -164,4 +171,4 @@ def startBot():
 botThread = Thread(target=startBot)
 scheduleThread = Thread(target=runSchedule)
 scheduleThread.start()
-botThread.run()
+#botThread.run()
