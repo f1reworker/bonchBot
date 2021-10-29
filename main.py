@@ -20,9 +20,9 @@ s=Service(ChromeDriverManager().install())
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--disable-dev-shm-usage")
+#chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -89,8 +89,10 @@ def pushSchedule():
             for q in range (0, len(timeSched)):
                 db.child("Schedule").child(timeSched[q]).child(user_id).set(False)
     getSchedule()
-def click(user, timeInt):
-    while len(user)!=0:
+def click(timeInt):
+    userArr = db.child("Schedule").child(timeInt).get().val()
+    while userArr!=None:
+        userArr = db.child("Schedule").child(timeInt).get().val()
         user = list(db.child("Schedule").child(timeInt).get().val().keys())
         for i in range(0, len(user)):
             thisUser = (db.child("Users").child(user[i]).get().val())
@@ -113,20 +115,22 @@ def click(user, timeInt):
                         sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
                     finally:
                         sch.click()
+                        time.sleep(1)
                         try:
                             driver.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
                         except NoSuchElementException:
                             driver.quit()
-                            return
+                            print(password)
+                            pass
                         else:
-                            db.child("Users").child(timeInt).child(user[i]).remove()
+                            print(login)
+                            db.child("Schedule").child(timeInt).child(user[i]).remove()
                             driver.quit()
     return schedule.CancelJob
 
 
 def runNewSchedule(timeInt):
     schedule.every().day.at(timeInt).do(click, timeInt)
-
 def removeSchedule():
     db.child("Schedule").remove()
 
