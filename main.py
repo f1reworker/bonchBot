@@ -56,8 +56,8 @@ def findSchedule(user):
                         timeLesson = str(int(lesson[0])-3)+":"+lesson[1]
                         if len(timeLesson)==4:  timeLesson = "0"+timeLesson
                         elementsArr.append(timeLesson)
-                    return elementsArr
-            driver.quit()
+                driver.quit()
+                return elementsArr
 
 def checkAuth(loginUser, passwordUser):
     driver = webdriver.Chrome(service = s, options = chrome_options)
@@ -120,12 +120,12 @@ def click(timeInt):
                             driver.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
                         except NoSuchElementException:
                             driver.quit()
-                            print(password)
                             pass
                         else:
                             print(login)
                             db.child("Schedule").child(timeInt).child(user[i]).remove()
                             driver.quit()
+            
     return schedule.CancelJob
 
 
