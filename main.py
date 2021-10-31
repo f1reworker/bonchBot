@@ -133,9 +133,7 @@ def timer(thread):
 
 def runNewClick(timeInt, i):
     countI = i%8
-    if i//8!=0 and countI == 0:
-        time.sleep(2400)
-    elif countI==0:
+    if countI==0:
         thread00 = Thread(target=click, args=(timeInt,))
         thread01 = Thread(target = timer, args=(thread00,))
         thread01.start()
