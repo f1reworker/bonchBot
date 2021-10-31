@@ -125,21 +125,59 @@ def click(timeInt):
                             print(login)
                             db.child("Schedule").child(timeInt).child(user[i]).remove()
                             driver.quit()
-            
+
+def timer(thread):
+    thread.start()
+    time.sleep(2300)
+    thread.join()
+
+def runNewClick(timeInt, i):
+    countI = i%8
+    if i//8!=0 and countI == 0:
+        time.sleep(2400)
+    elif countI==0:
+        thread00 = Thread(target=click, args=(timeInt,))
+        thread01 = Thread(target = timer, args=(thread00,))
+        thread01.start()
+    elif countI==1:
+        thread10 = Thread(target=click, args=(timeInt,))
+        thread11 = Thread(target = timer, args=(thread10,))
+        thread11.start()
+    elif countI==2:
+        thread20 = Thread(target=click, args=(timeInt,))
+        thread21 = Thread(target = timer, args=(thread20,))
+        thread21.start()
+    elif countI==3:
+        thread30 = Thread(target=click, args=(timeInt,))
+        thread31 = Thread(target = timer, args=(thread30,))
+        thread31.start()
+    elif countI==4:
+        thread40 = Thread(target=click, args=(timeInt,))
+        thread41 = Thread(target = timer, args=(thread40,))
+        thread41.start()
+    elif countI==5:
+        thread50 = Thread(target=click, args=(timeInt,))
+        thread51 = Thread(target = timer, args=(thread50,))
+        thread51.start()
+    elif countI==6:
+        thread60 = Thread(target=click, args=(timeInt,))
+        thread61 = Thread(target = timer, args=(thread60,))
+        thread61.start()
+    elif countI==7:
+        thread70 = Thread(target=click, args=(timeInt,))
+        thread71 = Thread(target = timer, args=(thread70,))
+        thread71.start()
     return schedule.CancelJob
 
-
-def runNewSchedule(timeInt):
-    schedule.every().day.at(timeInt).do(click, timeInt)
 def removeSchedule():
     db.child("Schedule").remove()
 
 def getSchedule():
-    timeArr = list(db.child("Schedule").get().val().keys())
-    for i in range(0, len(timeArr)):
-        runNewSchedule(timeArr[i])
+    if "Schedule" in list(db.get().val().keys()):
+        timeArr = list(db.child("Schedule").get().val().keys())
+        for i in range(0, len(timeArr)):
+            schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
 
-pushSchedule()
 schedule.every().day.at("22:00").do(removeSchedule)
 schedule.every().day.at("22:10").do(pushSchedule)
 def runSchedule():
@@ -150,6 +188,7 @@ def runSchedule():
 def startBot():
     executor.start_polling(bot, skip_updates=True)
 
+getSchedule()
 botThread = Thread(target=startBot)
 scheduleThread = Thread(target=runSchedule)
 scheduleThread.start()
