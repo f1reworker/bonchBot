@@ -1,7 +1,7 @@
-#TODO: каждая время новый поток
+from re import S
 from selenium import webdriver
 import time
-from selenium.common.exceptions import NoSuchElementException, UnexpectedAlertPresentException
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -151,7 +151,12 @@ def getSchedule():
     if "Schedule" in list(db.get().val().keys()):
         timeArr = list(db.child("Schedule").get().val().keys())
         for i in range(0, len(timeArr)):
-            schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
+            if timeArr[i]==timeArr[i-1]:
+                lesson = timeArr[i].split(" ")[3].replace(".", "").split(":")
+                timeLesson = lesson[0]+":"+str(int(lesson[1])+5)
+                schedule.every().day.at(timeLesson).do(runNewClick, timeLesson, i)
+            else:
+                schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
 
 schedule.every().day.at("21:10").do(pushSchedule)
 def runSchedule():
@@ -160,6 +165,6 @@ def runSchedule():
         time.sleep(1)
 
 
-getSchedule()
+pushSchedule()
 scheduleThread = Thread(target=runSchedule)
 scheduleThread.start()
