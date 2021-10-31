@@ -10,8 +10,6 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import schedule
 from threading import Thread
-from aiogram import executor
-from tgBot import bot
 from database import db
 
 
@@ -59,27 +57,8 @@ def findSchedule(user):
                 driver.quit()
                 return elementsArr
 
-def checkAuth(loginUser, passwordUser):
-    driver = webdriver.Chrome(service = s, options = chrome_options)
-    driver.get(url)
-    try:
-        login = WebDriverWait(driver, 1).until(
-        EC.visibility_of_element_located((By.NAME, "users")))
-    finally:
-        login.send_keys(loginUser)
-        driver.find_element(By.NAME,"parole").send_keys(passwordUser)
-        driver.find_element(By.NAME, "logButton").click()
-        time.sleep(0.5)
-        try: 
-            driver.find_element(By.CLASS_NAME, "lm_item")
-        except UnexpectedAlertPresentException:
-            driver.quit()
-            return False
-        else:
-            driver.quit()
-            return True
-
 def pushSchedule():
+    db.child("Schedule").remove()
     usersArr = db.child("Users").get().each()
     for i in range(0, len(usersArr)):
         user_id = usersArr[i].key()
@@ -167,8 +146,6 @@ def runNewClick(timeInt, i):
         thread71.start()
     return schedule.CancelJob
 
-def removeSchedule():
-    db.child("Schedule").remove()
 
 def getSchedule():
     if "Schedule" in list(db.get().val().keys()):
@@ -176,18 +153,13 @@ def getSchedule():
         for i in range(0, len(timeArr)):
             schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
 
-schedule.every().day.at("22:00").do(removeSchedule)
-schedule.every().day.at("22:10").do(pushSchedule)
+schedule.every().day.at("21:10").do(pushSchedule)
 def runSchedule():
     while True:
         schedule.run_pending()
         time.sleep(1)
 
-def startBot():
-    executor.start_polling(bot, skip_updates=True)
 
 getSchedule()
-botThread = Thread(target=startBot)
 scheduleThread = Thread(target=runSchedule)
 scheduleThread.start()
-#botThread.run()
