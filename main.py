@@ -66,44 +66,50 @@ def pushSchedule():
         timeSched = findSchedule(user)
         if timeSched!=None:
             for q in range (0, len(timeSched)):
-                db.child("Schedule").child(timeSched[q]).child(user_id).set(False)
+                if timeSched[q]==timeSched[q-1]:
+                    lesson = timeSched[q].split(":")
+                    timeLesson = lesson[0]+":"+str(int(lesson[1])+5)
+                    db.child("Schedule").child(timeLesson).child(user_id).set(False)
+                else:
+                    db.child("Schedule").child(timeSched[q]).child(user_id).set(False)
     getSchedule()
 def click(timeInt):
     userArr = db.child("Schedule").child(timeInt).get().val()
     while userArr!=None:
         userArr = db.child("Schedule").child(timeInt).get().val()
-        user = list(db.child("Schedule").child(timeInt).get().val().keys())
-        for i in range(0, len(user)):
-            thisUser = (db.child("Users").child(user[i]).get().val())
-            login = thisUser["login"]
-            password = thisUser["password"]
-            driver = webdriver.Chrome(service = s, options = chrome_options)
-            driver.get(url)
-            try:
-                loginArea = WebDriverWait(driver, 1).until(
-                EC.visibility_of_element_located((By.NAME, "users")))
-            finally:
-                loginArea.send_keys(login)
-                driver.find_element(By.NAME, "parole").send_keys(password)
-                driver.find_element(By.NAME, "logButton").click()
+        if userArr!=None:
+            user = list(db.child("Schedule").child(timeInt).get().val().keys())
+            for i in range(0, len(user)):
+                thisUser = (db.child("Users").child(user[i]).get().val())
+                login = thisUser["login"]
+                password = thisUser["password"]
+                driver = webdriver.Chrome(service = s, options = chrome_options)
+                driver.get(url)
                 try:
-                    button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
+                    loginArea = WebDriverWait(driver, 1).until(
+                    EC.visibility_of_element_located((By.NAME, "users")))
                 finally:
-                    button.click()
+                    loginArea.send_keys(login)
+                    driver.find_element(By.NAME, "parole").send_keys(password)
+                    driver.find_element(By.NAME, "logButton").click()
                     try:
-                        sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
+                        button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
                     finally:
-                        sch.click()
-                        time.sleep(1)
+                        button.click()
                         try:
-                            driver.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
-                        except NoSuchElementException:
-                            driver.quit()
-                            pass
-                        else:
-                            print(login)
-                            db.child("Schedule").child(timeInt).child(user[i]).remove()
-                            driver.quit()
+                            sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
+                        finally:
+                            sch.click()
+                            time.sleep(1)
+                            try:
+                                driver.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
+                            except NoSuchElementException:
+                                driver.quit()
+                                pass
+                            else:
+                                print(login)
+                                db.child("Schedule").child(timeInt).child(user[i]).remove()
+                                driver.quit()
 
 def timer(thread):
     thread.start()
@@ -151,12 +157,7 @@ def getSchedule():
     if "Schedule" in list(db.get().val().keys()):
         timeArr = list(db.child("Schedule").get().val().keys())
         for i in range(0, len(timeArr)):
-            if timeArr[i]==timeArr[i-1]:
-                lesson = timeArr[i].split(" ")[3].replace(".", "").split(":")
-                timeLesson = lesson[0]+":"+str(int(lesson[1])+5)
-                schedule.every().day.at(timeLesson).do(runNewClick, timeLesson, i)
-            else:
-                schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
+            schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
 
 schedule.every().day.at("21:10").do(pushSchedule)
 def runSchedule():
