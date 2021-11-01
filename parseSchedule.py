@@ -1,5 +1,5 @@
 from selenium import webdriver
-import time
+from database import db
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -18,7 +18,39 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
-def parseTable(user):
+def parseTable(user, user_id):   
+    driver = webdriver.Chrome(service = s, options = chrome_options)
+    driver.get(url)
+    try:
+        login = WebDriverWait(driver, 1).until(
+        EC.visibility_of_element_located((By.NAME, "users")))
+    finally:
+        login.send_keys(user["login"])
+        driver.find_element(By.NAME,"parole").send_keys(user["password"])
+        driver.find_element(By.NAME, "logButton").click()
+        try:
+            button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
+        finally:
+            button.click()
+            try:
+                sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
+            finally:
+                sch.click()
+                rows = WebDriverWait(driver, 1).until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, '[style="background: #FF9933 !important "]')))
+                key = ""
+                i = 0
+                for row in rows:
+                    matrixColumn = []
+                    column = row.find_elements(By.TAG_NAME, "td")
+                    for col in column:
+                        matrixColumn.append(col.text)
+                    db.child("Users Schedule").child(user_id).child(key).update({i: matrixColumn})
+                    i+=1
+
+
+
+
+def parseAllTable(user, user_id):
     driver = webdriver.Chrome(service = s, options = chrome_options)
     driver.get(url)
     try:
@@ -37,8 +69,14 @@ def parseTable(user):
             finally:
                 sch.click()
                 table = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="rightpanel"]/div/table/tbody')))
-                print(table.text.split("\n"))
-#parseTable({"login": "daniil.shalin2406@mail.ru", "password": "fireworker"})
-
-t = [0, 1, 2, 3, 4, 5]
-print(t[-1])
+                rows = table.find_elements(By.TAG_NAME, "tr")
+                key = ""
+                for row in rows:
+                    matrixColumn = []
+                    column = row.find_elements(By.TAG_NAME, "td")
+                    if len(column)==1:
+                        key = column[0].text.split("\n")[1].replace(".", "-")
+                    else:
+                        for col in column:
+                            matrixColumn.append(col.text.replace("\n", " "))
+                        db.child("Users Schedule").child(user_id).child(key).update({str(matrixColumn.pop(0).replace(".", ":")+" "+matrixColumn.pop(-2).replace(".", ":")): str(matrixColumn)})

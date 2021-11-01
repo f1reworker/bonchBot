@@ -11,6 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import schedule
 from threading import Thread
 from database import db
+from parseSchedule import parseTable
 
 
 s=Service(ChromeDriverManager().install())
@@ -59,10 +60,12 @@ def findSchedule(user):
 
 def pushSchedule():
     db.child("Schedule").remove()
+    db.child("Users Schedule").remove()
     usersArr = db.child("Users").get().each()
     for i in range(0, len(usersArr)):
         user_id = usersArr[i].key()
         user = db.child("Users").child(user_id).get().val()
+        parseTable(user, user_id)
         timeSched = findSchedule(user)
         if timeSched!=None:
             for q in range (0, len(timeSched)):
@@ -166,6 +169,5 @@ def runSchedule():
         time.sleep(1)
 
 
-pushSchedule()
 scheduleThread = Thread(target=runSchedule)
 scheduleThread.start()
