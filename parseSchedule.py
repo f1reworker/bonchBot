@@ -46,6 +46,7 @@ def parseTable(user, user_id):
                         matrixColumn.append(col.text)
                     db.child("Users Schedule").child(user_id).child(key).update({i: matrixColumn})
                     i+=1
+        driver.quit()
 
 
 
