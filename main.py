@@ -167,7 +167,6 @@ def runSchedule():
     while True:
         schedule.run_pending()
         time.sleep(1)
-
-
+pushSchedule()
 scheduleThread = Thread(target=runSchedule)
 scheduleThread.start()
