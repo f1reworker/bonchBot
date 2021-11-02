@@ -35,17 +35,18 @@ def pushSchedule():
         user_id = usersArr[i].key()
         user = db.child("Users").child(user_id).get().val()
         timeSched = parseTable(user, user_id)
-        if timeSched!=[]:
-            for q in range (0, len(timeSched)):
-                if timeSched[q]==timeSched[q-1] and len(timeSched)!=1:
-                    lesson = timeSched[q].split(":")
-                    timeLesson = lesson[0]+":"+str(int(lesson[1])+3)
-                    db.child("Schedule").child(timeLesson).child(user_id).set(False)
-                    print(timeLesson)
-                else:
-                    print(timeSched[q])
-                    db.child("Schedule").child(timeSched[q]).child(user_id).set(False)
-    getSchedule()
+        print(timeSched)
+    #     if timeSched!=[]:
+    #         for q in range (0, len(timeSched)):
+    #             if timeSched[q]==timeSched[q-1] and len(timeSched)!=1:
+    #                 lesson = timeSched[q].split(":")
+    #                 timeLesson = lesson[0]+":"+str(int(lesson[1])+3)
+    #                 db.child("Schedule").child(timeLesson).child(user_id).set(False)
+    #                 print(timeLesson)
+    #             else:
+    #                 print(timeSched[q])
+    #                 db.child("Schedule").child(timeSched[q]).child(user_id).set(False)
+    # getSchedule()
 def click(timeInt):
     userArr = db.child("Schedule").child(timeInt).get().val()
     while userArr!=None:
@@ -117,7 +118,7 @@ def getSchedule():
             schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
 
 schedule.every().day.at("21:10").do(pushSchedule)
-#schedule.every().day.at("05:50").do(getSchedule)
+schedule.every().day.at("05:55").do(getSchedule)
 def runSchedule():
     while True:
         schedule.run_pending()
