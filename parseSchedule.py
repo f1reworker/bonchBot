@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-
+import time
 s=Service(ChromeDriverManager().install())
 
 url = 'https://lk.sut.ru/cabinet/'
@@ -22,6 +22,7 @@ def parseTable(user, user_id):
     driver = webdriver.Chrome(service = s, options = chrome_options)
     driver.get(url)
     try:
+        login = ""
         login = WebDriverWait(driver, 1).until(
         EC.visibility_of_element_located((By.NAME, "users")))
     finally:
@@ -29,24 +30,39 @@ def parseTable(user, user_id):
         driver.find_element(By.NAME,"parole").send_keys(user["password"])
         driver.find_element(By.NAME, "logButton").click()
         try:
+            button = ""
             button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
         finally:
             button.click()
             try:
+                sch = []
                 sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
             finally:
                 sch.click()
-                rows = WebDriverWait(driver, 1).until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, '[style="background: #FF9933 !important "]')))
-                key = ""
-                i = 0
-                for row in rows:
-                    matrixColumn = []
-                    column = row.find_elements(By.TAG_NAME, "td")
-                    for col in column:
-                        matrixColumn.append(col.text)
-                    db.child("Users Schedule").child(user_id).child(key).update({i: matrixColumn})
-                    i+=1
-        driver.quit()
+                time.sleep(1)
+                try:
+                    rows = []
+                    rows = driver.find_elements(By.CSS_SELECTOR, '[style="background: #FF9933 !important "]')
+                except NoSuchElementException:
+                    driver.quit()
+                    return None
+                else:
+                    key = ""
+                    i = 0
+                    mCArr = []
+                    for row in rows:
+                        matrixColumn = []
+                        column = row.find_elements(By.TAG_NAME, "td")
+                        for col in column:
+                            matrixColumn.append(col.text)
+                        db.child("Users Schedule").child(user_id).child(key).update({i: matrixColumn})
+                        i+=1
+                        timeLesson = matrixColumn[0].split("-")[0].split("(")[-1].replace(".", ":")
+                        if len(timeLesson)==4:  timeLesson = "0"+timeLesson
+                        mCArr.append(timeLesson)
+                    driver.quit() 
+                    return mCArr
+
 
 
 
