@@ -14,7 +14,7 @@ import schedule
 from threading import Thread
 from database import db
 from parseSchedule import parseTable
-
+from datetime import datetime
 
 s=Service(ChromeDriverManager().install())
 
@@ -36,17 +36,8 @@ def pushSchedule():
         user = db.child("Users").child(user_id).get().val()
         timeSched = parseTable(user, user_id)
         print(timeSched)
-    #     if timeSched!=[]:
-    #         for q in range (0, len(timeSched)):
-    #             if timeSched[q]==timeSched[q-1] and len(timeSched)!=1:
-    #                 lesson = timeSched[q].split(":")
-    #                 timeLesson = lesson[0]+":"+str(int(lesson[1])+3)
-    #                 db.child("Schedule").child(timeLesson).child(user_id).set(False)
-    #                 print(timeLesson)
-    #             else:
-    #                 print(timeSched[q])
-    #                 db.child("Schedule").child(timeSched[q]).child(user_id).set(False)
-    # getSchedule()
+
+
 def click(timeInt):
     userArr = db.child("Schedule").child(timeInt).get().val()
     while userArr!=None:
@@ -110,15 +101,30 @@ def runNewClick(timeInt, i):
         thread31.start()
     return schedule.CancelJob
 
+def timerFiveMinutes():
+    i = 0
+    while i<133:
+        getSchedule(i)
+        time.sleep(300)
+        i+=1
+    
 
-def getSchedule():
+def getSchedule(i):
     if "Schedule" in list(db.get().val().keys()):
-        timeArr = list(db.child("Schedule").get().val().keys())
-        for i in range(0, len(timeArr)):
-            schedule.every().day.at(timeArr[i]).do(runNewClick, timeArr[i], i)
+        dateTimeNow = str(datetime.now().time())[:5]
+        if dateTimeNow in list(db.child("Schedule").get().val().keys()):
+            timeInt = db.child("Schedule").child(dateTimeNow).get().val()
+            runNewClick(timeInt, i)
+
+
+def startTimer():
+    timerThread = Thread(target=timerFiveMinutes)
+    timerThread.start()
 
 schedule.every().day.at("21:10").do(pushSchedule)
-schedule.every().day.at("05:55").do(getSchedule)
+schedule.every().day.at("06:00").do(startTimer)
+
+
 def runSchedule():
     while True:
         schedule.run_pending()
