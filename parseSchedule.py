@@ -60,7 +60,7 @@ def parseTable(user, user_id):
                         mCArr.append(timeLesson)
                 q = 0
                 while True:
-                    time.sleep(1)
+                    time.sleep(1.5)
                     answer = ""
                     table = driver.find_elements(By.XPATH, '//*[@id="rightpanel"]/div/table/tbody')
                     if table==[]: 
@@ -77,6 +77,7 @@ def parseTable(user, user_id):
                         else:
                             for col in column:
                                 matrixColumn.append(col.text)
+                            print(matrixColumn)
                             answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
                     db.child("Table").child(user_id).update({q: answer})  
                     q+=1
