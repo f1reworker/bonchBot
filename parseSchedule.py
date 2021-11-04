@@ -63,7 +63,7 @@ def parseTable(user, user_id):
                     time.sleep(2)
                     answer = ""
                     try:
-                        table = driver.find_element(By.XPATH, '/html/body/div[1]/div[10]/div/table/tbody')
+                        table = driver.find_element(By.CSS_SELECTOR, '[style="text-shadow:none;"]')
                     except NoSuchElementException:
                         driver.quit()
                         return
@@ -83,4 +83,4 @@ def parseTable(user, user_id):
                                 answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
                         db.child("Table").child(user_id).update({q: answer})  
                         q+=1
-                        driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/nav/ul').find_elements(By.TAG_NAME, "li")[-1].click()
+                        next = driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/nav/ul').find_elements(By.TAG_NAME, "li")[-1].click()
