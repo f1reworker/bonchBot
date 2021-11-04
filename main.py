@@ -30,12 +30,12 @@ chrome_options.add_argument("--no-sandbox")
 def pushSchedule():
     db.child("Users Schedule").remove()
     db.child("Schedule").remove()
+    db.child("Table").remove()
     usersArr = db.child("Users").get().each()
     for i in range(0, len(usersArr)):
         user_id = usersArr[i].key()
         user = db.child("Users").child(user_id).get().val()
-        timeSched = parseTable(user, user_id)
-        print(timeSched)
+        parseTable(user, user_id)
 
 
 def click(timeInt):
@@ -121,7 +121,7 @@ def startTimer():
     timerThread = Thread(target=timerFiveMinutes)
     timerThread.start()
 
-schedule.every().day.at("21:10").do(pushSchedule)
+schedule.every().day.at("21:00").do(pushSchedule)
 schedule.every().day.at("06:00").do(startTimer)
 
 
