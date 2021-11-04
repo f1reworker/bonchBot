@@ -62,23 +62,25 @@ def parseTable(user, user_id):
                 while True:
                     time.sleep(1.5)
                     answer = ""
-                    table = driver.find_elements(By.XPATH, '//*[@id="rightpanel"]/div/table/tbody')
-                    if table==[]: 
+                    try:
+                        table = driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/table/tbody')
+                    except NoSuchElementException:
                         driver.quit()
                         return
-                    rows = table[0].find_elements(By.TAG_NAME, "tr")
-                    key = ""
-                    for row in rows:
-                        matrixColumn = []
-                        column = row.find_elements(By.TAG_NAME, "td")
-                        if len(column)==1:
-                            key = column[0].text
-                            answer+=("\n"+fmt.hbold(key) + "\n"*2)
-                        else:
-                            for col in column:
-                                matrixColumn.append(col.text)
-                            print(matrixColumn)
-                            answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
-                    db.child("Table").child(user_id).update({q: answer})  
-                    q+=1
-                    driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/nav/ul').find_elements(By.TAG_NAME, "li")[-1].click()
+                    else:
+                        rows = table.find_elements(By.TAG_NAME, "tr")
+                        key = ""
+                        for row in rows:
+                            matrixColumn = []
+                            column = row.find_elements(By.TAG_NAME, "td")
+                            if len(column)==1:
+                                key = column[0].text
+                                answer+=("\n"+fmt.hbold(key) + "\n"*2)
+                            else:
+                                for col in column:
+                                    matrixColumn.append(col.text)
+                                print(matrixColumn)
+                                answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
+                        db.child("Table").child(user_id).update({q: answer})  
+                        q+=1
+                        driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/nav/ul').find_elements(By.TAG_NAME, "li")[-1].click()
