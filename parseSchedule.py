@@ -78,48 +78,6 @@ def parseTable(user, user_id):
                             for col in column:
                                 matrixColumn.append(col.text)
                             answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
-                    db.child("Table").child(user_id).update({q: answer})
+                    db.child("Table").child(user_id).update({q: answer})  
                     q+=1
                     driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/nav/ul').find_elements(By.TAG_NAME, "li")[-1].click()
-
-# def parseAllTable(user, user_id):
-#     i = 0
-#     driver = webdriver.Chrome(service = s, options = chrome_options)
-#     driver.get(url)
-#     try:
-#         login = WebDriverWait(driver, 1).until(
-#         EC.visibility_of_element_located((By.NAME, "users")))
-#     finally:
-#         login.send_keys(user["login"])
-#         driver.find_element(By.NAME,"parole").send_keys(user["password"])
-#         driver.find_element(By.NAME, "logButton").click()
-#         try:
-#             button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
-#         finally:
-#             button.click()
-#             try:
-#                 sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
-#             finally:
-#                 sch.click()
-#                 while True:
-#                     time.sleep(1)
-#                     answer = ""
-#                     table = driver.find_elements(By.XPATH, '//*[@id="rightpanel"]/div/table/tbody')
-#                     if table==[]: 
-#                         driver.quit()
-#                         return
-#                     rows = table[0].find_elements(By.TAG_NAME, "tr")
-#                     key = ""
-#                     for row in rows:
-#                         matrixColumn = []
-#                         column = row.find_elements(By.TAG_NAME, "td")
-#                         if len(column)==1:
-#                             key = column[0].text
-#                             answer+=("\n"+fmt.hbold(key) + "\n"*2)
-#                         else:
-#                             for col in column:
-#                                 matrixColumn.append(col.text)
-#                             answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
-#                     db.child("Table").child(user_id).update({i: answer})
-#                     i+=1
-#                     driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/nav/ul').find_elements(By.TAG_NAME, "li")[-1].click()
