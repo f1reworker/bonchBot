@@ -60,10 +60,10 @@ def parseTable(user, user_id):
                         mCArr.append(timeLesson)
                 q = 0
                 while True:
-                    time.sleep(1.5)
+                    time.sleep(2)
                     answer = ""
                     try:
-                        table = driver.find_element(By.XPATH, '//*[@id="rightpanel"]/div/table/tbody')
+                        table = driver.find_element(By.XPATH, '/html/body/div[1]/div[10]/div/table/tbody')
                     except NoSuchElementException:
                         driver.quit()
                         return
