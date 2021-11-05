@@ -14,9 +14,9 @@ s=Service(ChromeDriverManager().install())
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-#chrome_options.add_argument("--headless")
-#chrome_options.add_argument("--disable-gpu")
-#chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -58,10 +58,12 @@ def parseTable(user, user_id):
                         timeLesson = matrixColumn[0].split("-")[0].split("(")[-1].replace(".", ":")
                         if len(timeLesson)==4:  timeLesson = "0"+timeLesson
                         mCArr.append(timeLesson)
-                q = 0
-                while True:
-                    time.sleep(2)
+                button = driver.find_element(By.CSS_SELECTOR, '[style="color:blue;"]').click()
+                while True: 
+                    time.sleep(1)
                     answer = ""
+                    key = ""
+                    key = int(driver.find_elements(By.TAG_NAME, "h3")[0].text.split("№")[1].split(" ")[0])
                     try:
                         table = driver.find_element(By.CSS_SELECTOR, '[style="text-shadow:none;"]')
                     except NoSuchElementException:
@@ -69,24 +71,18 @@ def parseTable(user, user_id):
                         return
                     else:
                         rows = table.find_elements(By.TAG_NAME, "tr")
-                        key = ""
+                        day = ""
                         for row in rows:
                             matrixColumn = []
                             column = row.find_elements(By.TAG_NAME, "td")
                             if len(column)==1:
-                                key = column[0].text
-                                answer+=("\n"+fmt.hbold(key) + "\n"*2)
+                                day = column[0].text
+                                answer+=("\n"+fmt.hbold(day) + "\n"*2)
                             else:
                                 for col in column:
                                     matrixColumn.append(col.text)
                                 print(matrixColumn)
                                 answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
-                        db.child("Table").child(user_id).update({q: answer})  
-                        q+=1
-                        if q==1: 
-                            button = driver.find_element(By.CSS_SELECTOR, '[style="color:blue;"]')
-                            print(button)
-                            button.click()
-                            time.sleep(1)
+                        db.child("Table").child(user_id).update({key: answer})  
                         driver.find_element(By.PARTIAL_LINK_TEXT, "След").click()
                         

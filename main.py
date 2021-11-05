@@ -30,7 +30,6 @@ chrome_options.add_argument("--no-sandbox")
 def pushSchedule():
     db.child("Users Schedule").remove()
     db.child("Schedule").remove()
-    db.child("Table").remove()
     usersArr = db.child("Users").get().each()
     for i in range(0, len(usersArr)):
         user_id = usersArr[i].key()
@@ -107,7 +106,9 @@ def timerFiveMinutes():
         getSchedule(i)
         time.sleep(300)
         i+=1
-    
+
+def changeWeek():
+    db.update({"Number Week": (db.child("Number Week").get().val()+1)})   
 
 def getSchedule(i):
     if "Schedule" in list(db.get().val().keys()):
@@ -121,8 +122,10 @@ def startTimer():
     timerThread = Thread(target=timerFiveMinutes)
     timerThread.start()
 
-schedule.every().day.at("21:00").do(pushSchedule)
+
+schedule.every().day.at("21:02").do(pushSchedule)
 schedule.every().day.at("06:00").do(startTimer)
+schedule.every().monday.at("21:00").do(changeWeek)
 
 
 def runSchedule():
