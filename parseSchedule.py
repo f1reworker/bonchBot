@@ -14,9 +14,9 @@ s=Service(ChromeDriverManager().install())
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--disable-dev-shm-usage")
+#chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -83,5 +83,10 @@ def parseTable(user, user_id):
                                 answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
                         db.child("Table").child(user_id).update({q: answer})  
                         q+=1
-                        driver.find_element(By.ID, "rightpanel").find_element(By.CSS_SELECTOR, '[class="container-fluid"]').find_element(By.TAG_NAME, "nav").find_elements(By.TAG_NAME, "li")[-1].click()
+                        if q==1: 
+                            button = driver.find_element(By.CSS_SELECTOR, '[style="color:blue;"]')
+                            print(button)
+                            button.click()
+                            time.sleep(1)
+                        driver.find_element(By.PARTIAL_LINK_TEXT, "След").click()
                         
