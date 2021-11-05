@@ -83,4 +83,5 @@ def parseTable(user, user_id):
                                 answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
                         db.child("Table").child(user_id).update({q: answer})  
                         q+=1
-                        driver.find_element(By.ID, "rightpanel").find_element(By.CSS_SELECTOR, '[class="container-fluid"]').find_element(By.TAG_NAME, 'nav').find_elements(By.TAG_NAME, "li")[-1].click()
+                        driver.find_element(By.ID, "rightpanel").find_element(By.CSS_SELECTOR, '[class="container-fluid"]').find_element(By.TAG_NAME, "nav").find_elements(By.TAG_NAME, "li")[-1].click()
+                        
