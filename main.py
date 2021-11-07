@@ -45,6 +45,7 @@ def click(timeInt):
             user = list(db.child("Schedule").child(timeInt).get().val().keys())
             for i in range(0, len(user)):
                 thisUser = (db.child("Users").child(user[i]).get().val())
+                teacherandTime = db.child("Schedule").child(timeInt).child(user[i]).get().val().split("|")
                 login = thisUser["login"]
                 password = thisUser["password"]
                 driver = webdriver.Chrome(service = s, options = chrome_options)
@@ -65,16 +66,21 @@ def click(timeInt):
                         finally:
                             sch.click()
                             time.sleep(1)
-                            try:
-                                driver.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
-                            except NoSuchElementException:
-                                driver.quit()
-                                pass
-                            else:
-                                print(login)
-                                db.child("Schedule").child(timeInt).child(user[i]).remove()
-                                driver.quit()
-
+                            rows = driver.find_elements(By.CSS_SELECTOR, '[style="background: #FF9933 !important "]')
+                            for row in rows:
+                                if teacherandTime[0] and teacherandTime[1] in row.text:
+                                    try:
+                                        row.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
+                                    except NoSuchElementException:
+                                        driver.quit()
+                                        pass
+                                        break
+                                    else:
+                                        print(login)
+                                        db.child("Schedule").child(timeInt).child(user[i]).remove()
+                                        driver.quit()
+                                        pass
+                                        break
 def timer(thread):
     thread.start()
     time.sleep(1150)
@@ -114,8 +120,7 @@ def getSchedule(i):
     if "Schedule" in list(db.get().val().keys()):
         dateTimeNow = str(datetime.now().time())[:5]
         if dateTimeNow in list(db.child("Schedule").get().val().keys()):
-            timeInt = db.child("Schedule").child(dateTimeNow).get().val()
-            runNewClick(timeInt, i)
+            runNewClick(dateTimeNow, i)
 
 
 def startTimer():

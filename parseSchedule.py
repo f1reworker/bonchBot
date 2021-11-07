@@ -82,7 +82,9 @@ def parseTable(user, user_id):
                                 for col in column:
                                     matrixColumn.append(col.text)
                                 print(matrixColumn)
-                                answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + matrixColumn[2] + "\n" + "     " + fmt.hcode(matrixColumn[3]) + "\n"*2)
+                                if ("Спортивные площадки" in matrixColumn[2]) or ("Дистанционно" in matrixColumn[2]):  cab = matrixColumn[2]
+                                else: cab = fmt.hlink(url="https://www.nav.sut.ru/?cab=k" + matrixColumn[2].split("/")[-1] + "-" + matrixColumn[2].split(";")[0].replace("-", "a"), title=matrixColumn[2].split(";")[0].replace("-", "/")+"/"+matrixColumn[2].split("/")[-1])
+                                answer+=(matrixColumn[0] + "\n" + "     " + fmt.hbold(matrixColumn[1].split("\n")[0]) + "\n" + "       " + fmt.hitalic(matrixColumn[1].split("\n")[1]) + "\n" + "     " + cab + "\n" + "     " + matrixColumn[3] + "\n"*2)
                         db.child("Table").child(user_id).update({key: answer})  
                         driver.find_element(By.PARTIAL_LINK_TEXT, "След").click()
                         
