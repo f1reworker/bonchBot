@@ -1,6 +1,5 @@
 #!TODO: составление расписания с вечера, опрос про пары вечером
 
-from re import S
 from selenium import webdriver
 import time
 from selenium.common.exceptions import NoSuchElementException
@@ -28,8 +27,6 @@ chrome_options.add_argument("--no-sandbox")
 
 
 def pushSchedule():
-    db.child("Users Schedule").remove()
-    db.child("Schedule").remove()
     usersArr = db.child("Users").get().each()
     for i in range(0, len(usersArr)):
         user_id = usersArr[i].key()
@@ -81,6 +78,12 @@ def click(timeInt):
                                         driver.quit()
                                         pass
                                         break
+
+def removeAndPushSchedule():
+    db.child("Users Schedule").remove()
+    db.child("Schedule").remove()
+    pushSchedule()
+
 def timer(thread):
     thread.start()
     time.sleep(1150)
@@ -128,7 +131,7 @@ def startTimer():
     timerThread.start()
 
 
-schedule.every().day.at("21:02").do(pushSchedule)
+schedule.every().day.at("21:02").do(removeAndPushSchedule)
 schedule.every().day.at("06:00").do(startTimer)
 schedule.every().monday.at("21:00").do(changeWeek)
 
