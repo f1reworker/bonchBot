@@ -48,19 +48,34 @@ def click(timeInt):
                 driver = webdriver.Chrome(service = s, options = chrome_options)
                 driver.get(url)
                 try:
+                    loginArea = ""
                     loginArea = WebDriverWait(driver, 1).until(
                     EC.visibility_of_element_located((By.NAME, "users")))
-                finally:
+                except Exception as e:
+                    print("Except" + str(e))
+                    driver.quit()
+                    pass
+                else:
                     loginArea.send_keys(login)
                     driver.find_element(By.NAME, "parole").send_keys(password)
                     driver.find_element(By.NAME, "logButton").click()
                     try:
+                        button = ""
                         button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
-                    finally:
+                    except Exception as e:
+                        print("Except" + str(e))
+                        driver.quit()
+                        pass
+                    else:
                         button.click()
                         try:
+                            sch = ""
                             sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
-                        finally:
+                        except Exception as e:
+                            print("Except" + str(e))
+                            driver.quit()
+                            pass
+                        else:
                             sch.click()
                             time.sleep(1)
                             rows = driver.find_elements(By.CSS_SELECTOR, '[style="background: #FF9933 !important "]')
