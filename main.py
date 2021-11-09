@@ -99,28 +99,29 @@ def removeAndPushSchedule():
     db.child("Schedule").remove()
     pushSchedule()
 
-def timer(thread):
+def timer(thread, timeInt):
     thread.start()
     time.sleep(1150)
+    db.child("Schedule").child(timeInt).remove()
     thread.join()
 
 def runNewClick(timeInt, i):
     countI = i%4
     if countI==0:
         thread00 = Thread(target=click, args=(timeInt,))
-        thread01 = Thread(target = timer, args=(thread00,))
+        thread01 = Thread(target = timer, args=(thread00, timeInt,))
         thread01.start()
     elif countI==1:
         thread10 = Thread(target=click, args=(timeInt,))
-        thread11 = Thread(target = timer, args=(thread10,))
+        thread11 = Thread(target = timer, args=(thread10, timeInt,))
         thread11.start()
     elif countI==2:
         thread20 = Thread(target=click, args=(timeInt,))
-        thread21 = Thread(target = timer, args=(thread20,))
+        thread21 = Thread(target = timer, args=(thread20, timeInt,))
         thread21.start()
     elif countI==3:
-        thread30 = Thread(target=click, args=(timeInt,))
-        thread31 = Thread(target = timer, args=(thread30,))
+        thread30 = Thread(target=click, args=(timeInt, timeInt,))
+        thread31 = Thread(target = timer, args=(thread30, timeInt,))
         thread31.start()
     return schedule.CancelJob
 
@@ -148,7 +149,7 @@ def startTimer():
 
 schedule.every().day.at("21:02").do(removeAndPushSchedule)
 schedule.every().day.at("06:00").do(startTimer)
-schedule.every().monday.at("21:00").do(changeWeek)
+schedule.every().sunday.at("21:00").do(changeWeek)
 
 
 def runSchedule():
