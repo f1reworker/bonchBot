@@ -11,6 +11,8 @@ firebaseConfig = {
 firebase = pyrebase.initialize_app(firebaseConfig)
 db= firebase.database()
 
+count = 0
+
 def addUser(user_id, login, password):
     data = {
         "login": login,

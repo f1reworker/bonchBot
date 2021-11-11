@@ -12,6 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import schedule
 from threading import Thread
 from database import db
+import database
 from parseSchedule import parseTable
 from datetime import datetime
 
@@ -20,9 +21,9 @@ s=Service(ChromeDriverManager().install())
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--disable-dev-shm-usage")
+#chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -99,56 +100,48 @@ def removeAndPushSchedule():
     db.child("Schedule").remove()
     pushSchedule()
 
-def timer(thread, timeInt):
-    thread.start()
-    time.sleep(1150)
-    db.child("Schedule").child(timeInt).remove()
-    thread.join()
 
 def runNewClick(timeInt, i):
     countI = i%4
     if countI==0:
-        thread00 = Thread(target=click, args=(timeInt,))
-        thread01 = Thread(target = timer, args=(thread00, timeInt,))
-        thread01.start()
+        thread0 = Thread(target=click, args=(timeInt,))
+        thread0.start()
     elif countI==1:
-        thread10 = Thread(target=click, args=(timeInt,))
-        thread11 = Thread(target = timer, args=(thread10, timeInt,))
-        thread11.start()
+        thread1 = Thread(target=click, args=(timeInt,))
+        thread1.start()
     elif countI==2:
-        thread20 = Thread(target=click, args=(timeInt,))
-        thread21 = Thread(target = timer, args=(thread20, timeInt,))
-        thread21.start()
+        thread2 = Thread(target=click, args=(timeInt,))
+        thread2.start()
     elif countI==3:
-        thread30 = Thread(target=click, args=(timeInt, timeInt,))
-        thread31 = Thread(target = timer, args=(thread30, timeInt,))
-        thread31.start()
-    return schedule.CancelJob
+        thread3 = Thread(target=click, args=(timeInt,))
+        thread3.start()
 
-def timerFiveMinutes():
-    i = 0
-    while i<133:
-        getSchedule(i)
-        time.sleep(300)
-        i+=1
 
 def changeWeek():
     db.update({"Number Week": (db.child("Number Week").get().val()+1)})   
 
-def getSchedule(i):
+def getSchedule():
+    i = database.count
+    if i > 132:
+        database.count = 0
+        return schedule.CancelJob
+    dateTimeNow = str(datetime.now().time())[:5]
+    removeTimeInt = int(dateTimeNow.split(":")[0])*60+int(dateTimeNow.split(":")[1])-20
+    removeTime = str(removeTimeInt//60) + ":" + str(removeTimeInt%60)
+    if len(removeTime)==4:  removeTime = "0"+ removeTime
+    db.child("Schedule").child(removeTime).remove()
     if "Schedule" in list(db.get().val().keys()):
-        dateTimeNow = str(datetime.now().time())[:5]
         if dateTimeNow in list(db.child("Schedule").get().val().keys()):
             runNewClick(dateTimeNow, i)
+    database.count+=1
 
 
 def startTimer():
-    timerThread = Thread(target=timerFiveMinutes)
-    timerThread.start()
+    schedule.every(5).minutes.do(getSchedule)
 
-
+startTimer()
 schedule.every().day.at("21:02").do(removeAndPushSchedule)
-schedule.every().day.at("06:00").do(startTimer)
+schedule.every().day.at("05:55").do(startTimer)
 schedule.every().sunday.at("21:00").do(changeWeek)
 
 
@@ -156,6 +149,6 @@ def runSchedule():
     while True:
         schedule.run_pending()
         time.sleep(1)
-pushSchedule()
+
 scheduleThread = Thread(target=runSchedule)
 scheduleThread.start()
