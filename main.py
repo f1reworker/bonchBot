@@ -139,9 +139,9 @@ def getSchedule():
 def startTimer():
     schedule.every(5).minutes.do(getSchedule)
 
-startTimer()
+#startTimer()
 schedule.every().day.at("21:02").do(removeAndPushSchedule)
-schedule.every().day.at("05:55").do(startTimer)
+schedule.every().day.at("10:45").do(startTimer)
 schedule.every().sunday.at("21:00").do(changeWeek)
 
 
