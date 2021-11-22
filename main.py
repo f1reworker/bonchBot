@@ -50,6 +50,7 @@ def click(timeInt, users):
                 EC.visibility_of_element_located((By.NAME, "users")))
             except Exception as e:
                 print("Except" + str(e))
+                print("Ошибка в логинации")
                 driver.quit()
                 pass
             else:
