@@ -35,86 +35,68 @@ def pushSchedule():
         parseTable(user, user_id)
 
 
-def click(timeInt):
-    userArr = db.child("Schedule").child(timeInt).get().val()
-    while userArr!=None:
-        userArr = db.child("Schedule").child(timeInt).get().val()
-        if userArr!=None:
-            user = list(db.child("Schedule").child(timeInt).get().val().keys())
-            for i in range(0, len(user)):
-                thisUser = (db.child("Users").child(user[i]).get().val())
-                teacherandTime = db.child("Schedule").child(timeInt).child(user[i]).get().val().split("|")
-                login = thisUser["login"]
-                password = thisUser["password"]
-                driver = webdriver.Chrome(service = s, options = chrome_options)
-                driver.get(url)
+def click(timeInt, users):
+    while users!=[]:
+        for i in range(0, len(users)):
+            thisUser = (db.child("Users").child(users[i]).get().val())
+            teacherandTime = db.child("Schedule").child(timeInt).child(users[i]).get().val().split("|")
+            login = thisUser["login"]
+            password = thisUser["password"]
+            driver = webdriver.Chrome(service = s, options = chrome_options)
+            driver.get(url)
+            try:
+                loginArea = ""
+                loginArea = WebDriverWait(driver, 1).until(
+                EC.visibility_of_element_located((By.NAME, "users")))
+            except Exception as e:
+                print("Except" + str(e))
+                driver.quit()
+                pass
+            else:
+                loginArea.send_keys(login)
+                driver.find_element(By.NAME, "parole").send_keys(password)
+                driver.find_element(By.NAME, "logButton").click()
                 try:
-                    loginArea = ""
-                    loginArea = WebDriverWait(driver, 1).until(
-                    EC.visibility_of_element_located((By.NAME, "users")))
+                    button = ""
+                    button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
                 except Exception as e:
                     print("Except" + str(e))
                     driver.quit()
                     pass
                 else:
-                    loginArea.send_keys(login)
-                    driver.find_element(By.NAME, "parole").send_keys(password)
-                    driver.find_element(By.NAME, "logButton").click()
+                    button.click()
                     try:
-                        button = ""
-                        button = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.CLASS_NAME, "lm_item")))
+                        sch = ""
+                        sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
                     except Exception as e:
                         print("Except" + str(e))
                         driver.quit()
                         pass
                     else:
-                        button.click()
-                        try:
-                            sch = ""
-                            sch = WebDriverWait(driver, 1).until(EC.visibility_of_element_located((By.LINK_TEXT, "Расписание")))
-                        except Exception as e:
-                            print("Except" + str(e))
-                            driver.quit()
-                            pass
-                        else:
-                            sch.click()
-                            time.sleep(1)
-                            rows = driver.find_elements(By.CSS_SELECTOR, '[style="background: #FF9933 !important "]')
-                            for row in rows:
-                                if teacherandTime[0] and teacherandTime[1] in row.text:
-                                    try:
-                                        row.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
-                                    except NoSuchElementException:
-                                        driver.quit()
-                                        pass
-                                        break
-                                    else:
-                                        print(login)
-                                        db.child("Schedule").child(timeInt).child(user[i]).remove()
-                                        driver.quit()
-                                        pass
-                                        break
+                        sch.click()
+                        time.sleep(1)
+                        rows = driver.find_elements(By.CSS_SELECTOR, '[style="background: #FF9933 !important "]')
+                        for row in rows:
+                            if teacherandTime[0] and teacherandTime[1] in row.text:
+                                try:
+                                    row.find_element(By.PARTIAL_LINK_TEXT, "Начать").click()
+                                except NoSuchElementException:
+                                    driver.quit()
+                                    pass
+                                    break
+                                else:
+                                    print(login)
+                                    #db.child("Schedule").child(timeInt).child(users[i]).remove()
+                                    users.remove(users[i])
+                                    driver.quit()
+                                    pass
+                                    break
 
 def removeAndPushSchedule():
+    database.usersArr = []
     db.child("Users Schedule").remove()
     db.child("Schedule").remove()
     pushSchedule()
-
-
-def runNewClick(timeInt, i):
-    countI = i%4
-    if countI==0:
-        thread0 = Thread(target=click, args=(timeInt,))
-        thread0.start()
-    elif countI==1:
-        thread1 = Thread(target=click, args=(timeInt,))
-        thread1.start()
-    elif countI==2:
-        thread2 = Thread(target=click, args=(timeInt,))
-        thread2.start()
-    elif countI==3:
-        thread3 = Thread(target=click, args=(timeInt,))
-        thread3.start()
 
 
 def changeWeek():
@@ -129,15 +111,19 @@ def getSchedule():
     removeTimeInt = int(dateTimeNow.split(":")[0])*60+int(dateTimeNow.split(":")[1])-20
     removeTime = str(removeTimeInt//60) + ":" + str(removeTimeInt%60)
     if len(removeTime)==4:  removeTime = "0"+ removeTime
-    db.child("Schedule").child(removeTime).remove()
     if "Schedule" in list(db.get().val().keys()):
         if dateTimeNow in list(db.child("Schedule").get().val().keys()):
-            runNewClick(dateTimeNow, i)
+            del database.usersArr[database.usersArr.index(db.child("Schedule").child(removeTime).get().val().keys()[-1])]
+            database.usersArr.append(db.child("Schedule").child(dateTimeNow).get().val().keys())
+            print(database.usersArr)
+            clickThread = Thread(target=click, args = (dateTimeNow, database.usersArr,))
+            clickThread.start
     database.count+=1
 
 
 def startTimer():
     schedule.every(5).minutes.do(getSchedule)
+
 
 #startTimer()
 schedule.every().day.at("21:04").do(removeAndPushSchedule)
