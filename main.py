@@ -112,6 +112,7 @@ def getSchedule():
         database.count = 0
         return schedule.CancelJob
     dateTimeNow = str(datetime.now().time())[:5]
+    database.datetimeNow = dateTimeNow
     removeTime = str(int(dateTimeNow.split(":")[0])-1)+":" + dateTimeNow.split(":")[1]
     if len(removeTime)==4:  removeTime = "0"+ removeTime
     if "Schedule" in list(db.get().val().keys()):
@@ -119,7 +120,7 @@ def getSchedule():
             if db.child("Schedule").child(removeTime).get().val()!=None:
                 del database.usersArr[0:database.usersArr.index(db.child("Schedule").child(removeTime).get().val().keys()[-1])]
             if db.child("Schedule").child(dateTimeNow).get().val()!=None:
-                database.usersArr.append(db.child("Schedule").child(dateTimeNow).get().val().keys())
+                database.usersArr.append(list(db.child("Schedule").child(dateTimeNow).get().val().keys()))
             print(database.usersArr)
     database.count+=1
 
@@ -127,9 +128,11 @@ def getSchedule():
 def startTimer():
     schedule.every(5).minutes.do(getSchedule)
 
+
+
 #startTimer()
 schedule.every().day.at("21:04").do(removeAndPushSchedule)
-schedule.every().day.at("06:40").do(startTimer)
+schedule.every().day.at("08:05").do(startTimer)
 schedule.every().sunday.at("21:00").do(changeWeek)
 
 

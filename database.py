@@ -13,7 +13,7 @@ db= firebase.database()
 
 count = 0
 usersArr = []
-
+datetimeNow = ""
 def addUser(user_id, login, password):
     data = {
         "login": login,
