@@ -118,21 +118,22 @@ def getSchedule():
     if "Schedule" in list(db.get().val().keys()):
         if dateTimeNow in list(db.child("Schedule").get().val().keys()):
             if db.child("Schedule").child(removeTime).get().val()!=None:
-                del database.usersArr[0:database.usersArr.index(db.child("Schedule").child(removeTime).get().val().keys()[-1])]
+                for rT in list(db.child("Schedule").child(removeTime).get().val().keys()):
+                    if rT in database.usersArr: database.usersArr.remove(rT)
             if db.child("Schedule").child(dateTimeNow).get().val()!=None:
-                database.usersArr.append(list(db.child("Schedule").child(dateTimeNow).get().val().keys()))
+                database.usersArr+=list(db.child("Schedule").child(dateTimeNow).get().val().keys())
             print(database.usersArr)
     database.count+=1
+
 
 
 def startTimer():
     schedule.every(5).minutes.do(getSchedule)
 
 
-
 #startTimer()
 schedule.every().day.at("21:04").do(removeAndPushSchedule)
-schedule.every().day.at("08:05").do(startTimer)
+schedule.every().day.at("05:55").do(startTimer)
 schedule.every().sunday.at("21:00").do(changeWeek)
 
 
