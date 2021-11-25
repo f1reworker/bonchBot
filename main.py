@@ -21,9 +21,9 @@ s=Service(ChromeDriverManager().install())
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--disable-dev-shm-usage")
+# chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--disable-gpu")
+# chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -89,7 +89,7 @@ def click():
                                     break
                                 else:
                                     print(login)
-                                    #db.child("Schedule").child(timeInt).child(users[i]).remove()
+                                    db.child("Schedule Test").child(database.datetimeNow).update({users[i]:login})
                                     database.usersArr.remove(users[i])
                                     driver.quit()
                                     pass
@@ -108,7 +108,7 @@ def changeWeek():
 
 def getSchedule():
     i = database.count
-    if i > 132:
+    if i > 157:
         database.count = 0
         return schedule.CancelJob
     dateTimeNow = str(datetime.now().time())[:5]
@@ -125,15 +125,15 @@ def getSchedule():
             print(database.usersArr)
     database.count+=1
 
-
-
 def startTimer():
     schedule.every(5).minutes.do(getSchedule)
 
+def startThread():
+    getScheduleThread = Thread(target=startTimer)
+    getScheduleThread.start()
 
-#startTimer()
 schedule.every().day.at("21:04").do(removeAndPushSchedule)
-schedule.every().day.at("05:55").do(startTimer)
+schedule.every().day.at("05:55").do(startThread)
 schedule.every().sunday.at("21:00").do(changeWeek)
 
 
