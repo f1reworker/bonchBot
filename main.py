@@ -21,9 +21,9 @@ s=Service(ChromeDriverManager().install())
 url = 'https://lk.sut.ru/cabinet/'
 chrome_options = Options()
 chrome_options.add_argument("--incognito")
-# chrome_options.add_argument("--headless")
-# chrome_options.add_argument("--disable-gpu")
-# chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
@@ -134,7 +134,7 @@ def startThread():
     getScheduleThread.start()
 
 schedule.every().day.at("21:04").do(removeAndPushSchedule)
-schedule.every().day.at("06:15").do(startThread)
+schedule.every().day.at("05:55").do(getSchedule)
 schedule.every().sunday.at("21:00").do(changeWeek)
 
 
