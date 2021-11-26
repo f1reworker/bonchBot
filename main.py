@@ -91,6 +91,7 @@ def click():
                                     print(login)
                                     db.child("Schedule Test").child(database.datetimeNow).update({users[i]:login})
                                     database.usersArr.remove(users[i])
+                                    i-=1
                                     driver.quit()
                                     pass
                                     break
@@ -133,7 +134,7 @@ def startThread():
     getScheduleThread.start()
 
 schedule.every().day.at("21:04").do(removeAndPushSchedule)
-schedule.every().day.at("05:55").do(startThread)
+schedule.every().day.at("06:15").do(startThread)
 schedule.every().sunday.at("21:00").do(changeWeek)
 
 
